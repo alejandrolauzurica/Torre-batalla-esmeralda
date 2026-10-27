@@ -44,6 +44,13 @@
     .warn { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 6px 10px; font-size: .85rem; }
     .invalid { border-color: var(--bad); }
     .note { color: var(--muted); font-size: .85rem; margin: 0 0 12px; }
+    .tabs { display: flex; gap: 8px; margin-top: 10px; }
+    fieldset.slot { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--card); }
+    fieldset.slot legend { color: var(--muted); font-size: .85rem; padding: 0 6px; }
+    .mv { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px; width: 100%; }
+    table.cand td, table.cand th { text-align: left; }
+    details { margin: 8px 0 16px; }
+    [hidden] { display: none !important; }
     @media (max-width: 420px) { .grid { grid-template-columns: 1fr; } main { padding: 12px; } }
   </style>
 </head>
@@ -51,11 +58,18 @@
   <header>
     <h1>Torre Batalla Esmeralda</h1>
     <p>3ª generación · nivel 100 · 3 contra 3</p>
+    <nav class="tabs" id="tabs">
+      <button data-vista="equipos" class="primary">Mis equipos</button>
+      <button data-vista="ronda">Ronda</button>
+    </nav>
   </header>
   <main>
-    <div class="bar" id="bar"></div>
-    <p class="note" id="aviso"></p>
-    <div class="grid" id="equipo"></div>
+    <div id="vista-equipos">
+      <div class="bar" id="bar"></div>
+      <p class="note" id="aviso"></p>
+      <div class="grid" id="equipo"></div>
+    </div>
+    <div id="vista-ronda" hidden></div>
   </main>
   <datalist id="dl-especies"></datalist>
   <datalist id="dl-movimientos"></datalist>

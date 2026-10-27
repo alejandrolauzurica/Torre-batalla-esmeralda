@@ -1,5 +1,6 @@
 // Pantalla "Mis equipos". Todo se ejecuta en el navegador; los equipos se guardan en localStorage.
 import { calcStats, NATURES, STAT_KEYS } from "./engine.js";
+import { initRonda } from "./ronda.js";
 
 const LABEL = { hp: "PS", atk: "Ataque", def: "Defensa", spa: "At. Esp.", spd: "Def. Esp.", spe: "Velocidad" };
 const STORE = "torre-batalla:v1";
@@ -195,5 +196,21 @@ async function main() {
   render();
   $("equipo").addEventListener("change", onChange);
   $("equipo").addEventListener("input", onInput);
+  // Pestañas: «Mis equipos» y «Ronda» (la de ronda se carga la primera vez que se abre).
+  let ronda = null;
+  document.getElementById("tabs").addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-vista]");
+    if (!b) return;
+    const v = b.dataset.vista;
+    document.querySelectorAll("#tabs button").forEach((x) => x.classList.toggle("primary", x === b));
+    $("vista-equipos").hidden = v !== "equipos";
+    $("vista-ronda").hidden = v !== "ronda";
+    if (v === "ronda") {
+      try {
+        ronda ||= await initRonda({ DATA, byName, esc, norm, getTeam: team, getStats, state, save, root: $("vista-ronda") });
+        ronda.render();
+      } catch (err) { $("vista-ronda").innerHTML = `<p class="warn">No se ha podido abrir la pantalla de ronda: ${esc(err.message)}</p>`; }
+    }
+  });
 }
 main().catch((err) => { document.querySelector("main").innerHTML = `<p class="warn">No se han podido cargar los datos: ${esc(err.message)}</p>`; });
