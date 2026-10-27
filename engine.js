@@ -20,7 +20,7 @@ export const NATURES = {
 // Etapas de estadísticas (-6..+6): [numerador, denominador]. Fuente: gStatStageRatios.
 const STAGE_RATIOS = [[10, 40], [10, 35], [10, 30], [10, 25], [10, 20], [10, 15], [10, 10],
   [15, 10], [20, 10], [25, 10], [30, 10], [35, 10], [40, 10]];
-const applyStage = (stat, stage) => Math.floor((stat * STAGE_RATIOS[stage + 6][0]) / STAGE_RATIOS[stage + 6][1]);
+export const applyStage = (stat, stage) => Math.floor((stat * STAGE_RATIOS[stage + 6][0]) / STAGE_RATIOS[stage + 6][1]);
 
 // Tipos "especiales" en 3ª gen: la categoría depende del TIPO del movimiento, no del movimiento.
 const SPECIAL_TYPES = new Set(["FIRE", "WATER", "GRASS", "ELECTRIC", "PSYCHIC", "ICE", "DRAGON", "DARK"]);
@@ -193,3 +193,12 @@ function typeMultiplier(moveType, defender, opts, data, attacker) {
 }
 
 export const koChance = (rolls, hp) => rolls.filter((x) => x >= hp).length / rolls.length;
+
+// Velocidad efectiva en combate: etapas, parálisis (÷4 en 3ª gen) y habilidades de clima (Nado rápido / Clorofila ×2).
+export function effectiveSpeed(mon, weather) {
+  let v = applyStage(mon.stats.spe, mon.stages?.spe ?? 0);
+  if (mon.status === "PARALYSIS") v = Math.floor(v / 4);
+  if (weather === "RAIN" && mon.ability === "SWIFT_SWIM") v *= 2;
+  if (weather === "SUN" && mon.ability === "CHLOROPHYLL") v *= 2;
+  return v;
+}

@@ -1,6 +1,6 @@
 // Análisis de un combate: qué rivales pueden salir y qué pasa entre tu Pokémon y cada set posible.
 // Funciones puras (sin pantalla) para poder probarlas con node.
-import { calcStats, calcDamage, koChance } from "./engine.js";
+import { calcStats, calcDamage, koChance, effectiveSpeed } from "./engine.js";
 
 const EVK = { HP: "hp", ATTACK: "atk", DEFENSE: "def", SP_ATTACK: "spa", SP_DEFENSE: "spd", SPEED: "spe" };
 
@@ -91,7 +91,11 @@ export function analyze(ctx, mine, cands, opts = {}) {
   const combos = [];
   for (const c of cands) {
     const abs = abilitiesOf(ctx, c.set.species);
-    for (const a of abs) combos.push({ set: c.set, w: c.p / abs.length, rival: buildRival(ctx, c.set, a) });
+    for (const a of abs) {
+      const rival = buildRival(ctx, c.set, a);
+      if (opts.rivalState) { rival.status = opts.rivalState.status || null; rival.stages = opts.rivalState.stages || undefined; }
+      combos.push({ set: c.set, w: c.p / abs.length, rival });
+    }
   }
   const pctOf = (v, hp) => Math.round((v / hp) * 100);
 
@@ -116,8 +120,9 @@ export function analyze(ctx, mine, cands, opts = {}) {
   const moveStats = new Map(); // movimiento -> {has: prob de tenerlo, ko: prob OHKO ponderada si lo tiene, max%}
   let faster = 0, tie = 0, ohkoAny = 0;
   for (const k of combos) {
-    if (mine.mon.stats.spe > k.rival.stats.spe) faster += k.w;
-    else if (mine.mon.stats.spe === k.rival.stats.spe) tie += k.w;
+    const mySpe = effectiveSpeed(mine.mon, opts.weather), rvSpe = effectiveSpeed(k.rival, opts.weather);
+    if (mySpe > rvSpe) faster += k.w;
+    else if (mySpe === rvSpe) tie += k.w;
     let best = 0;
     for (const name of k.set.moves) {
       const m = mv(ctx, name);
