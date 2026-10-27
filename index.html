@@ -5,29 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Torre Batalla Esmeralda</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; }
-    code { background: #eee; padding: 0 .3em; border-radius: 4px; }
-    .ok { color: #0a7a2f; font-weight: 600; }
+    :root {
+      --bg: #f6f7f9; --card: #ffffff; --text: #1d2330; --muted: #5d667a; --line: #d9dde6;
+      --accent: #1f6feb; --accent-text: #ffffff; --warn: #9a5b00; --warn-bg: #fff4dc; --bad: #b3261e; --ok: #1a7f37;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #11141a; --card: #1a1f29; --text: #e8ebf2; --muted: #9aa3b5; --line: #2c3342;
+        --accent: #5b9bff; --accent-text: #0b1220; --warn: #ffcf70; --warn-bg: #3a2e10; --bad: #ff8a80; --ok: #6fdc8c; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    header { padding: 16px; border-bottom: 1px solid var(--line); background: var(--card); }
+    header h1 { margin: 0; font-size: 1.25rem; }
+    header p { margin: 2px 0 0; color: var(--muted); font-size: .9rem; }
+    main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+    .bar select, .bar input { min-width: 0; }
+    input, select, button { font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+    button { cursor: pointer; }
+    button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+    button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+    .mon { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .mon h2 { margin: 0; font-size: 1rem; color: var(--muted); font-weight: 600; }
+    .row { display: grid; grid-template-columns: 90px 1fr; gap: 8px; align-items: center; }
+    .row label { color: var(--muted); font-size: .85rem; }
+    .row input, .row select { width: 100%; }
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge { font-size: .75rem; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+    .modes { display: flex; gap: 14px; font-size: .9rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td { padding: 3px 4px; text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); font-weight: 600; font-size: .8rem; }
+    td input { width: 64px; text-align: right; padding: 3px 6px; }
+    .stat { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .nat-up { color: var(--ok); } .nat-down { color: var(--bad); }
+    .warn { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 6px 10px; font-size: .85rem; }
+    .invalid { border-color: var(--bad); }
+    .note { color: var(--muted); font-size: .85rem; margin: 0 0 12px; }
+    @media (max-width: 420px) { .grid { grid-template-columns: 1fr; } main { padding: 12px; } }
   </style>
 </head>
 <body>
-  <h1>Torre Batalla Esmeralda</h1>
-  <p>Web de prueba (3ª generación, nivel 100, 3 vs 3).</p>
-  <p id="estado">Cargando datos…</p>
-  <ul id="detalle"></ul>
-  <script>
-    fetch("sets.json")
-      .then(r => r.json())
-      .then(sets => {
-        const dragonite = sets.filter(s => s.species === "DRAGONITE");
-        const conHielo = dragonite.filter(s => s.moves.some(m => m === "ICE_BEAM" || m === "BLIZZARD"));
-        document.getElementById("estado").innerHTML = '<span class="ok">Datos cargados correctamente.</span>';
-        document.getElementById("detalle").innerHTML =
-          "<li>Sets totales: <b>" + sets.length + "</b></li>" +
-          "<li>Sets de Dragonite: <b>" + dragonite.length + "</b></li>" +
-          "<li>Dragonite con ataque de hielo: <b>" + conHielo.length + "</b></li>";
-      })
-      .catch(() => { document.getElementById("estado").textContent = "Error al cargar los datos."; });
-  </script>
+  <header>
+    <h1>Torre Batalla Esmeralda</h1>
+    <p>3ª generación · nivel 100 · 3 contra 3</p>
+  </header>
+  <main>
+    <div class="bar" id="bar"></div>
+    <p class="note" id="aviso"></p>
+    <div class="grid" id="equipo"></div>
+  </main>
+  <datalist id="dl-especies"></datalist>
+  <datalist id="dl-movimientos"></datalist>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
