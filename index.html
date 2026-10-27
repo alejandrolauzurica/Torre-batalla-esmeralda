@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Torre Batalla Esmeralda</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; }
+    code { background: #eee; padding: 0 .3em; border-radius: 4px; }
+    .ok { color: #0a7a2f; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Torre Batalla Esmeralda</h1>
+  <p>Web de prueba (3ª generación, nivel 100, 3 vs 3).</p>
+  <p id="estado">Cargando datos…</p>
+  <ul id="detalle"></ul>
+  <script>
+    fetch("sets.json")
+      .then(r => r.json())
+      .then(sets => {
+        const dragonite = sets.filter(s => s.species === "DRAGONITE");
+        const conHielo = dragonite.filter(s => s.moves.some(m => m === "ICE_BEAM" || m === "BLIZZARD"));
+        document.getElementById("estado").innerHTML = '<span class="ok">Datos cargados correctamente.</span>';
+        document.getElementById("detalle").innerHTML =
+          "<li>Sets totales: <b>" + sets.length + "</b></li>" +
+          "<li>Sets de Dragonite: <b>" + dragonite.length + "</b></li>" +
+          "<li>Dragonite con ataque de hielo: <b>" + conHielo.length + "</b></li>";
+      })
+      .catch(() => { document.getElementById("estado").textContent = "Error al cargar los datos."; });
+  </script>
+</body>
+</html>
